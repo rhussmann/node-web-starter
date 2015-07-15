@@ -1,0 +1,16 @@
+{
+  "name": "christmas-lists",
+  "version": "1.0.0",
+  "description": "A webapp for Christmas lists",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ricky Hussmann",
+  "license": "ISC",
+  "devDependencies": {
+    "chai": "^3.0.0",
+    "mocha": "^2.2.5",
+    "vows": "^0.8.1"
+  }
+}
