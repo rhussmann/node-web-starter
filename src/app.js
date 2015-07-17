@@ -1,7 +1,9 @@
 var bodyParser = require('body-parser');
 var express = require('express');
+
 var Emailer = require('./controllers/emailer');
 var Mailer = require('./controllers/mailer');
+var UserController = require('./controllers/user_controller');
 
 var app = express();
 var emailer = new Emailer({
@@ -9,18 +11,12 @@ var emailer = new Emailer({
     callback(null, "http://christmastime.com");
   }
 }, new Mailer());
+var userController = new UserController();
 
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({extended: false}));
 
-app.post('/register', function(req,res) {
-  emailer.sendVerificationEmail({email: req.body.email}, function(err) {
-    if(err) {
-      console.log("Error sending registration email: " + err);
-    }
-    res.sendStatus((err) ? 500 : 201);
-  });
-});
+app.post('/register', userController.registerUser);
 
 var server = app.listen(3000, function () {
   var host = server.address().address;
