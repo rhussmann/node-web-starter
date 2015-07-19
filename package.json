@@ -1,10 +1,10 @@
 {
-  "name": "christmas-lists",
+  "name": "node-web-starter",
   "version": "1.0.0",
-  "description": "A webapp for Christmas lists",
+  "description": "A foundation for building a node webapp",
   "main": "app.js",
   "scripts": {
-    "test": "mocha src/test -R nyan",
+    "test": "node ./node_modules/mocha/bin/mocha src/test",
     "start": "node src/app.js"
   },
   "author": "Ricky Hussmann",

@@ -4,14 +4,13 @@ var expect = require('chai').expect;
 var mongoose = require('mongoose');
 var User = require('../models/users');
 
+var emptyCollection = function(done) {
+  mongoose.models['User'].find().remove().exec();
+  done();
+};
+
 describe('A user object', function() {
-  before(function(done) {
-    mongoose.connection.db.dropCollection('users', function(err) {
-      if(err)
-        throw err;
-      done();
-    });
-  });
+  before(emptyCollection);
   var thing = new User();
   it('has a username property', function() {
     thing.should.contain.key('username');
@@ -47,12 +46,27 @@ describe('A user object', function() {
     });
   });
   it('finds a saved user', function(done) {
+    before(emptyCollection);
     thing.setEmail("user@example.org");
     thing.save(function(err) {
       expect(err).to.be.null;
       User.find({email: "user@example.org"}, function(err, users) {
         expect(err).to.be.null;
         users.should.have.length(1);
+        done();
+      });
+    });
+  });
+  it('throws a validation error when attempting to duplicate an email address', function(done) {
+    before(emptyCollection);
+    var newUser = new User();
+    newUser.setEmail("bart@example.org");
+    newUser.save(function(err) {
+      expect(err).to.be.null;
+      var duplicateUser = new User();
+      duplicateUser.setEmail("bart@example.org");
+      duplicateUser.save(function(err) {
+        expect(err).to.be.not.null;
         done();
       });
     });

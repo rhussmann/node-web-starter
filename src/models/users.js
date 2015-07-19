@@ -1,8 +1,16 @@
 var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
 
-var UserModel = mongoose.model('User', {
-  email: String
+var userSchema = new Schema({
+  email:  {
+    type: String,
+    index: {
+      unique: true,
+      dropDups: true
+    }
+  }
 });
+var UserModel = mongoose.model('User', userSchema);
 
 // Constructor
 function User() {
