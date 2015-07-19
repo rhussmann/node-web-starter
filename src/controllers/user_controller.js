@@ -13,11 +13,14 @@ UserController.prototype.registerUser = function(req, res, callback) {
   newUser.setFullName(req.body.fullName);
   newUser.save(function(err) {
     if(err) {
+      res.status(409);
       res.render('error');
+    } else {
+      res.status(201);
     }
 
     if(isFunction(callback)) {
-      callback(null);
+      callback(err);
     }
   });
 };
