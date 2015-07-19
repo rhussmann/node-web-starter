@@ -1,11 +1,13 @@
 var bodyParser = require('body-parser');
 var express = require('express');
+var mongoose = require('mongoose');
 
 var UserController = require('./controllers/user_controller');
 
 var app = express();
 var userController = new UserController();
 
+mongoose.connect('mongodb://localhost/node-web-starter');
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({extended: false}));
 app.set('view engine', 'jade');
