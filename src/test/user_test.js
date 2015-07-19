@@ -71,4 +71,29 @@ describe('A user object', function() {
       });
     });
   });
+  it('saves the full name property', function(done) {
+    before(emptyCollection);
+    var newUser = new User();
+    newUser.setFullName("New User");
+    newUser.save(function(err, user) {
+      expect(user._id).to.be.not.null;
+      User.find({_id: user._id}, function(err, results) {
+        results.should.have.length(1);
+        var foundUser = results[0];
+        foundUser.fullName.should.equal("New User");
+        done();
+      });
+    });
+  });
+  it('normalizes email addresses to lowercase', function(done) {
+    before(emptyCollection);
+    var newUser = new User();
+    var email = "AMixedCaseEmail@example.org";
+    newUser.setEmail(email);
+    newUser.save(function(err, user) {
+      expect(err).to.be.null;
+      user.email.should.equal(email.toLowerCase());
+      done();
+    });
+  });
 });

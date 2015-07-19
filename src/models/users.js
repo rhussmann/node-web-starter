@@ -4,11 +4,13 @@ var Schema = mongoose.Schema;
 var userSchema = new Schema({
   email:  {
     type: String,
+    lowercase: true,
     index: {
       unique: true,
       dropDups: true
     }
-  }
+  },
+  fullName: String
 });
 var UserModel = mongoose.model('User', userSchema);
 
@@ -21,6 +23,13 @@ function User() {
   this.email = "";
   this.verified = false;
   this.model = new UserModel();
+}
+
+function createObjectFromModel(model) {
+  var newUser = new User();
+  newUser.model = model;
+  newUser.fullName = model.fullName;
+  return newUser;
 }
 
 User.prototype.setUsername = function(username) {
@@ -39,12 +48,25 @@ User.prototype.setEmail = function(email) {
   this.model.email = email;
 };
 
+User.prototype.setFullName = function(fullName) {
+  this.fullName = fullName;
+  this.model.fullName = fullName;
+};
+
 User.prototype.save = function(callback) {
   this.model.save(callback);
 };
 
 User.find = function(findParams, callback) {
-  UserModel.find(findParams, callback);
+  UserModel.find(findParams, function(err, users) {
+    if (err)
+      return callback(err);
+    var transformedUsers = [];
+    users.forEach(function(user) {
+      transformedUsers.push(createObjectFromModel(user));
+    });
+    callback(null, transformedUsers);
+  });
 };
 
 // export the class
