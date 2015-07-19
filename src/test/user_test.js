@@ -1,8 +1,17 @@
+require('chai').should();
+
 var expect = require('chai').expect;
-var should = require('chai').should();
+var mongoose = require('mongoose');
 var User = require('../models/users');
 
 describe('A user object', function() {
+  before(function(done) {
+    mongoose.connection.db.dropCollection('users', function(err) {
+      if(err)
+        throw err;
+      done();
+    });
+  });
   var thing = new User();
   it('has a username property', function() {
     thing.should.contain.key('username');
@@ -35,6 +44,17 @@ describe('A user object', function() {
     thing.password = 'password';
     thing.comparePassword('password', function(err, matches) {
       matches.should.be.true;
+    });
+  });
+  it('finds a saved user', function(done) {
+    thing.setEmail("user@example.org");
+    thing.save(function(err) {
+      expect(err).to.be.null;
+      User.find({email: "user@example.org"}, function(err, users) {
+        expect(err).to.be.null;
+        users.should.have.length(1);
+        done();
+      });
     });
   });
 });

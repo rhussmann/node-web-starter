@@ -1,22 +1,19 @@
 var bodyParser = require('body-parser');
 var express = require('express');
 
-var Emailer = require('./controllers/emailer');
-var Mailer = require('./controllers/mailer');
 var UserController = require('./controllers/user_controller');
 
 var app = express();
-var emailer = new Emailer({
-  createVerificationRecord: function(user, callback) {
-    callback(null, "http://christmastime.com");
-  }
-}, new Mailer());
 var userController = new UserController();
 
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({extended: false}));
+app.set('view engine', 'jade');
 
 app.post('/register', userController.registerUser);
+app.get('/view_test', function(req, res) {
+  res.render('index', {title: 'Hey', message: 'Hello, there!'});
+});
 
 var server = app.listen(3000, function () {
   var host = server.address().address;

@@ -23,10 +23,10 @@ describe('The user controller', function() {
     var req = {};
     req.body = parameters;
     var res = {};
-    res.sendStatus = sinon.spy();
+    res.render = sinon.spy();
 
     userController.registerUser(req, res, function(err) {
-      expect(res.sendStatus.calledWith(500)).to.be.true;
+      expect(res.render.calledWith('error')).to.be.true;
       done();
     });
   });

@@ -6,7 +6,7 @@ function isFunction(functionToCheck) {
 }
 
 UserController.prototype.registerUser = function(req, res, callback) {
-  res.sendStatus(500);
+  res.render('error');
   if(isFunction(callback)) {
     callback(null);
   }
