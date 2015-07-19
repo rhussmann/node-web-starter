@@ -1,7 +1,9 @@
 var expect = require('chai').expect;
+var mongoose = require('mongoose');
 var should = require('chai').should();
 var sinon = require('sinon');
 
+var Users = require('../models/users');
 var UserController = require('../controllers/user_controller');
 
 function getDefaultParameters() {
@@ -9,16 +11,20 @@ function getDefaultParameters() {
     username: "username",
     password: "password",
     password_conf: "password",
-    name: "Test User",
-    email: "user@example.org"
+    fullName: "Test User",
+    email: "user@example.org",
   };
 }
 
 describe('The user controller', function() {
+  before(function(done) {
+    // TODO: Need to extract this redundancy out to a common testing location
+    mongoose.models['User'].find().remove().exec();
+    done();
+  });
   var userController = new UserController();
-  it('validates required parameters', function(done) {
+  it('creates a user when given valid parameters', function(done) {
     var parameters = getDefaultParameters();
-    parameters.username = "";
 
     var req = {};
     req.body = parameters;
@@ -26,8 +32,14 @@ describe('The user controller', function() {
     res.render = sinon.spy();
 
     userController.registerUser(req, res, function(err) {
-      expect(res.render.calledWith('error')).to.be.true;
-      done();
+      expect(err).to.be.null;
+      Users.find({email: parameters.email}, function(err, results) {
+        expect(err).to.be.null;
+        expect(results).to.have.length(1);
+        var user = results[0];
+        user.verified.should.be.false;
+        done();
+      });
     });
   });
 });

@@ -29,6 +29,7 @@ function createObjectFromModel(model) {
   var newUser = new User();
   newUser.model = model;
   newUser.fullName = model.fullName;
+  newUser.email = model.email;
   return newUser;
 }
 
