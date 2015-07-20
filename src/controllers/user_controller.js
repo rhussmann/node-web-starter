@@ -16,17 +16,26 @@ UserController.prototype.registerUser = function(req, res, callback) {
   var newUser = new User();
   newUser.setEmail(req.body.email);
   newUser.setFullName(req.body.fullName);
-  newUser.save(function(err) {
-    if(err) {
-      res.status(409);
+  User.generateHash(req.body.password, function(err, hash) {
+    if (err) {
+      res.status(500);
       res.render('error');
-    } else {
-      res.redirect(301, '/registered');
+      return callback(err);
     }
 
-    if(isFunction(callback)) {
-      callback(err);
-    }
+    newUser.setPassword(hash);
+    newUser.save(function(err) {
+      if(err) {
+        res.status(409);
+        res.render('error');
+      } else {
+        res.redirect(301, '/registered');
+      }
+
+      if(isFunction(callback)) {
+        callback(err);
+      }
+    });
   });
 };
 

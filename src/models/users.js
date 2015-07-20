@@ -1,5 +1,8 @@
+var bcrypt = require('bcrypt');
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
+
+const USER_PASS_SALT_LENGTH = 10;
 
 var userSchema = new Schema({
   email:  {
@@ -10,7 +13,8 @@ var userSchema = new Schema({
       dropDups: true
     }
   },
-  fullName: String
+  fullName: String,
+  password: String
 });
 var UserModel = mongoose.model('User', userSchema);
 
@@ -30,6 +34,7 @@ function createObjectFromModel(model) {
   newUser.model = model;
   newUser.fullName = model.fullName;
   newUser.email = model.email;
+  newUser.password = model.password;
   return newUser;
 }
 
@@ -41,7 +46,7 @@ User.prototype.setUsername = function(username) {
 };
 
 User.prototype.comparePassword = function(password, callback) {
-  callback(null, this.password === password);
+  bcrypt.compare(password, this.password, callback);
 };
 
 User.prototype.setEmail = function(email) {
@@ -52,6 +57,11 @@ User.prototype.setEmail = function(email) {
 User.prototype.setFullName = function(fullName) {
   this.fullName = fullName;
   this.model.fullName = fullName;
+};
+
+User.prototype.setPassword = function(password) {
+  this.password = password;
+  this.model.password = password;
 };
 
 User.prototype.save = function(callback) {
@@ -67,6 +77,45 @@ User.find = function(findParams, callback) {
       transformedUsers.push(createObjectFromModel(user));
     });
     callback(null, transformedUsers);
+  });
+};
+
+User.generateHash = function(password, callback) {
+  bcrypt.genSalt(USER_PASS_SALT_LENGTH, function(err, salt) {
+    bcrypt.hash(password, salt, function(err, hash) {
+      if(err)
+        callback(err);
+      callback(null, hash);
+    });
+  });
+};
+
+User.login = function(email, password, callback) {
+  User.find({email: email}, function(err, users) {
+    if(err)
+      return callback(err);
+
+    if(users.length > 1) {
+        var error = new Error("Ambiguous users: found " +
+          users.length + " users with email " + email);
+        return callback(error);
+      }
+
+    if(users.length == 0) {
+      var error = new Error("No users found with email " + email);
+      return callback(error);
+    }
+
+    var user = users[0];
+    user.comparePassword(password, function(err, success) {
+      if(err)
+        return callback(err);
+
+      if(!success)
+        return callback(new Error("Login failed: invalid password"));
+
+      callback(null, user);
+    });
   });
 };
 
