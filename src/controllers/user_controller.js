@@ -8,6 +8,11 @@ function isFunction(functionToCheck) {
 }
 
 UserController.prototype.registerUser = function(req, res, callback) {
+  if (req.body.password !== req.body.password_conf) {
+    res.render('error');
+    return callback(new Error("Password does not match confirmation."));
+  }
+
   var newUser = new User();
   newUser.setEmail(req.body.email);
   newUser.setFullName(req.body.fullName);

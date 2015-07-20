@@ -63,4 +63,17 @@ describe('The user controller', function() {
       });
     });
   });
+
+  it('redirects renders an error on password mismatch', function(done) {
+    var parameters = getDefaultParameters();
+    parameters.password_conf = "mismatch";
+
+    var req = { body: parameters };
+    var res = { render: sinon.spy() };
+    userController.registerUser(req, res, function(err) {
+      err.should.not.be.null;
+      res.render.calledWith('error').should.be.true;
+      done();
+    });
+  });
 });

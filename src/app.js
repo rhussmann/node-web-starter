@@ -13,14 +13,11 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.set('view engine', 'jade');
 
 app.post('/register', userController.registerUser);
-app.get('/view_test', function(req, res) {
-  res.render('index', {title: 'Hey', message: 'Hello, there!'});
-});
 app.get('/registered', function(req,res) {res.render('registered');});
 
 var server = app.listen(3000, function () {
   var host = server.address().address;
   var port = server.address().port;
 
-  console.log('Example app listening at http://%s:%s', host, port);
+  console.log('App listening at http://%s:%s', host, port);
 });
