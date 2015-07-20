@@ -16,6 +16,7 @@ app.post('/register', userController.registerUser);
 app.get('/view_test', function(req, res) {
   res.render('index', {title: 'Hey', message: 'Hello, there!'});
 });
+app.get('/registered', function(req,res) {res.render('registered');});
 
 var server = app.listen(3000, function () {
   var host = server.address().address;

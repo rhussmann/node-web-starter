@@ -16,7 +16,7 @@ UserController.prototype.registerUser = function(req, res, callback) {
       res.status(409);
       res.render('error');
     } else {
-      res.status(201);
+      res.redirect(301, '/registered');
     }
 
     if(isFunction(callback)) {

@@ -31,7 +31,7 @@ describe('The user controller', function() {
     var parameters = getDefaultParameters();
 
     var req = { body: parameters };
-    var res = { status: sinon.spy() };
+    var res = { redirect: sinon.spy() };
 
     userController.registerUser(req, res, function(err) {
       expect(err).to.be.null;
@@ -40,6 +40,7 @@ describe('The user controller', function() {
         expect(results).to.have.length(1);
         var user = results[0];
         user.verified.should.be.false;
+        expect(res.redirect.calledWith(301, '/registered'));
         done();
       });
     });
