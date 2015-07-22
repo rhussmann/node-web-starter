@@ -1,0 +1,15 @@
+html
+  head
+    title!= "Login"
+  body
+    h1!= "Login"
+    form(name=login, action="/login", method="post")
+      label.
+        Email:
+      input(type="text", name="email")
+      br
+      label.
+        Password:
+      input(type="password", name="password")
+      br
+      input(type="submit", value="Login")

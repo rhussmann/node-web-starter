@@ -14,7 +14,8 @@ var userSchema = new Schema({
     }
   },
   fullName: String,
-  password: String
+  password: String,
+  verified: Boolean
 });
 var UserModel = mongoose.model('User', userSchema);
 
@@ -27,6 +28,7 @@ function User() {
   this.email = "";
   this.verified = false;
   this.model = new UserModel();
+  this.model.verified = false;
 }
 
 function createObjectFromModel(model) {
@@ -35,6 +37,7 @@ function createObjectFromModel(model) {
   newUser.fullName = model.fullName;
   newUser.email = model.email;
   newUser.password = model.password;
+  newUser.verified = model.verified || newUser.verified;
   return newUser;
 }
 
@@ -43,6 +46,11 @@ User.prototype.setUsername = function(username) {
     throw new Error();
   }
   this.username = username;
+};
+
+User.prototype.verify = function() {
+  this.verified = true;
+  this.model.verified = true;
 };
 
 User.prototype.comparePassword = function(password, callback) {

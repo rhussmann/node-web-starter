@@ -1,3 +1,4 @@
+var mongoose = require('mongoose');
 var User = require('../models/users');
 
 function UserController() {}
@@ -35,6 +36,44 @@ UserController.prototype.registerUser = function(req, res, callback) {
       if(isFunction(callback)) {
         callback(err);
       }
+    });
+  });
+};
+
+UserController.prototype.login = function(req, res, callback) {
+  User.login(req.body.email, req.body.password, function(err, user) {
+    if (err) {
+      res.render('error');
+      return callback(err);
+    }
+
+    if (!user.verified) {
+      res.redirect(301, '/account_not_verified');
+      return callback(new Error("Account for user not verified: " + user.email));
+    }
+
+    res.redirect(301, '/home');
+    callback(null);
+  });
+};
+
+UserController.prototype.verifyUser = function(verificationToken, callback) {
+  User.find({_id: mongoose.Types.ObjectId(verificationToken)}, function(err, users) {
+    if(err)
+      return callback(err);
+
+    if(users.length > 1) {
+      return callback(new Error("Ambiguous user for verification token " + verificationToken));
+    }
+
+    if(users.length === 0 ) {
+      return callback(new Error("No user found for verification token " + verificationToken));
+    }
+
+    var user = users[0];
+    user.verify();
+    user.save(function(err) {
+      callback(err);
     });
   });
 };

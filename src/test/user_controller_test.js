@@ -20,6 +20,12 @@ function getDefaultParameters() {
   };
 }
 
+function getIdFromObjectId(object) {
+  var regex = /ObjectId\("(.*)"\)/g;
+  var matches = regex.exec(object.toString());
+  return matches[1];
+}
+
 describe('The user controller', function() {
   beforeEach(function(done) {
     // TODO: Need to extract this redundancy out to a common testing location
@@ -121,6 +127,31 @@ describe('The user controller', function() {
       User.login(parameters.email, parameters.password.substring(0, parameters.password.length-2), function(err, user) {
         expect(err).to.not.be.null;
         done();
+      });
+    });
+  });
+
+  it('verifies a non-verified user', function(done) {
+    var parameters = getDefaultParameters();
+    var req = { body: parameters };
+    var res = { redirect: sinon.spy() };
+
+    userController.registerUser(req, res, function(err) {
+      expect(err).to.be.null;
+      User.find({email: parameters.email}, function(err, users) {
+        expect(err).to.be.null;
+        expect(users).to.have.length(1);
+        var user = users[0];
+        user.verified.should.be.false;
+        userController.verifyUser(user.model._id, function(err) {
+          expect(err).to.be.null;
+          User.find({_id: user.model._id}, function(err, users) {
+            expect(err).to.be.null;
+            expect(users).to.have.length(1);
+            users[0].verified.should.be.true;
+            done();
+          });
+        });
       });
     });
   });
