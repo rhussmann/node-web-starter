@@ -1,7 +1,8 @@
+var config = require('../config-test');
 var mongoose = require('mongoose');
 
 before(function() {
-  mongoose.connect('mongodb://localhost/node-web-starter-test');
+  mongoose.connect(config.mongo_url);
 });
 
 after(function() {

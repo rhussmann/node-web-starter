@@ -1,6 +1,11 @@
 var mongoose = require('mongoose');
 var User = require('../models/users');
 
+var verificationRecorder = require('./verification_recorder');
+var Emailer = require('./emailer');
+var Mailer = require('./mailer');
+var mailer = new Emailer(verificationRecorder, new Mailer());
+
 function UserController() {}
 
 function isFunction(functionToCheck) {
@@ -32,6 +37,11 @@ UserController.prototype.registerUser = function(req, res, callback) {
       } else {
         res.redirect(301, '/registered');
       }
+
+      mailer.sendVerificationEmail(newUser, function(err) {
+        if (err)
+          console.log(err);
+      });
 
       if(isFunction(callback)) {
         callback(err);
@@ -73,7 +83,7 @@ UserController.prototype.verifyUser = function(verificationToken, callback) {
     var user = users[0];
     user.verify();
     user.save(function(err) {
-      callback(err);
+      callback(err, user);
     });
   });
 };
