@@ -33,7 +33,11 @@ describe('The user controller', function() {
     done();
   });
 
-  var userController = new UserController();
+  var mockEmailer = {
+    sendVerificationEmail: sinon.spy()
+  };
+  var userController = new UserController(mockEmailer);
+
   it('creates a user when given valid parameters', function(done) {
     var parameters = getDefaultParameters();
 
@@ -48,6 +52,7 @@ describe('The user controller', function() {
         var user = results[0];
         user.verified.should.be.false;
         expect(res.redirect.calledWith(301, '/registered'));
+        expect(mockEmailer.sendVerificationEmail.called).to.be.true;
         done();
       });
     });

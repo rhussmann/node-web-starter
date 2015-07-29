@@ -7,7 +7,13 @@ var mongoose = require('mongoose');
 var UserController = require('./controllers/user_controller');
 
 var app = express();
-var userController = new UserController();
+
+var verificationRecorder = require('./controllers/verification_recorder');
+var Emailer = require('./controllers/emailer');
+var Mailer = require('./controllers/mailer');
+var mailer = new Emailer(verificationRecorder, new Mailer(config.gmail_user, config.gmail_pass));
+
+var userController = new UserController(mailer);
 
 mongoose.connect(config.mongo_url);
 app.use(express.static('public'));
@@ -20,7 +26,13 @@ function generateTemplateRenderer(templateName) {
   }
 }
 
-app.post('/register', userController.registerUser);
+function wrapControllerMethod(controller, controllerMethod) {
+  return function(req, res, callback) {
+    controller[controllerMethod](req, res, callback);
+  }
+}
+
+app.post('/register', wrapControllerMethod(userController, 'registerUser'));
 app.get('/registered', generateTemplateRenderer('registered'));
 app.get('/login', generateTemplateRenderer('login'));
 app.post('/login', userController.login);

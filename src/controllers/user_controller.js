@@ -1,12 +1,9 @@
 var mongoose = require('mongoose');
 var User = require('../models/users');
 
-var verificationRecorder = require('./verification_recorder');
-var Emailer = require('./emailer');
-var Mailer = require('./mailer');
-var mailer = new Emailer(verificationRecorder, new Mailer());
-
-function UserController() {}
+function UserController(emailer) {
+  this.emailer = emailer;
+}
 
 function isFunction(functionToCheck) {
   var getType = {};
@@ -14,6 +11,7 @@ function isFunction(functionToCheck) {
 }
 
 UserController.prototype.registerUser = function(req, res, callback) {
+  var that = this;
   if (req.body.password !== req.body.password_conf) {
     res.render('error');
     return callback(new Error("Password does not match confirmation."));
@@ -38,7 +36,7 @@ UserController.prototype.registerUser = function(req, res, callback) {
         res.redirect(301, '/registered');
       }
 
-      mailer.sendVerificationEmail(newUser, function(err) {
+      that.emailer.sendVerificationEmail(newUser, function(err) {
         if (err)
           console.log(err);
       });
