@@ -8,10 +8,10 @@ var UserController = require('./controllers/user_controller');
 
 var app = express();
 
-var verificationRecorder = require('./controllers/verification_recorder');
+var VerificationRecorder = require('./controllers/verification_recorder');
 var Emailer = require('./controllers/emailer');
 var Mailer = require('./controllers/mailer');
-var mailer = new Emailer(verificationRecorder, new Mailer(config.gmail_user, config.gmail_pass));
+var mailer = new Emailer(new VerificationRecorder(config.app_root_url), new Mailer(config.gmail_user, config.gmail_pass));
 
 var userController = new UserController(mailer);
 
